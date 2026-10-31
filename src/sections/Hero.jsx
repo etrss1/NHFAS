@@ -3,25 +3,27 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BadgeCheck, MapPinned, ShieldCheck } from 'lucide-react';
 import { Button } from '../components/Button';
 import { cn } from '../lib/utils';
-
-const words = [
-  'Skilled Hands',
-  'Heavy Haul Services',
-  'Expert Carpenters',
-  'Logistics Pros',
-  'Creative Craftsmen',
-  'Local Plumbers',
-];
-
-const trustChips = [
-  { icon: BadgeCheck, label: 'Identity review workflow' },
-  { icon: ShieldCheck, label: 'Job escrow tracking' },
-  { icon: MapPinned, label: 'Location sharing when enabled' },
-];
+import { useTranslation } from '../i18n/I18nContext';
 
 const Hero = () => {
+  const { t } = useTranslation();
   const [currentWord, setCurrentWord] = useState(0);
   const [isFading, setIsFading] = useState(false);
+
+  const words = [
+    t('hero.word_skilled_hands'),
+    t('hero.word_heavy_haul'),
+    t('hero.word_carpenters'),
+    t('hero.word_logistics'),
+    t('hero.word_craftsmen'),
+    t('hero.word_plumbers'),
+  ];
+
+  const trustChips = [
+    { icon: BadgeCheck, label: t('hero.trust_id') },
+    { icon: ShieldCheck, label: t('hero.trust_escrow') },
+    { icon: MapPinned, label: t('hero.trust_location') },
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,7 +34,7 @@ const Hero = () => {
       }, 500);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [words.length]);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-brand-navy via-brand-navy to-[#123a6b] pt-28 pb-16 lg:pt-36 lg:pb-24">
@@ -47,7 +49,7 @@ const Hero = () => {
           {/* Copy */}
           <div className="w-full lg:w-1/2">
             <h1 className="min-h-[160px] text-4xl font-extrabold leading-[1.15] tracking-tight text-white md:min-h-[190px] md:text-5xl lg:min-h-[210px] lg:text-6xl">
-              <span className="block">Find</span>
+              <span className="block">{t('hero.find')}</span>
               <span
                 className={cn(
                   'block bg-gradient-to-r from-brand-green via-emerald-300 to-brand-green bg-clip-text text-transparent transition-all duration-500',
@@ -56,19 +58,18 @@ const Hero = () => {
               >
                 {words[currentWord]}
               </span>
-              <span className="block">Near You.</span>
+              <span className="block">{t('hero.near_you')}</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-300">
-              Whether you need skilled hands for delicate crafts or heavy equipment for major logistics,
-              NHFAS brings service requests, provider discovery, and job coordination together in one place.
+              {t('hero.desc')}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button as={Link} to="/search" size="lg" className="justify-center gap-2">
-                Find a service <ArrowRight className="h-5 w-5" />
+                {t('hero.find_service')} <ArrowRight className="h-5 w-5" />
               </Button>
               <Button as={Link} to="/signup" variant="outline" size="lg" className="justify-center gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white focus:ring-white/40">
-                Become a provider
+                {t('hero.become_provider')}
               </Button>
             </div>
 
@@ -87,13 +88,6 @@ const Hero = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Wave divider */}
-      <div className="absolute inset-x-0 bottom-0" aria-hidden="true">
-        <svg viewBox="0 0 1440 72" fill="none" className="h-12 w-full text-white" preserveAspectRatio="none">
-          <path d="M0 72h1440V28c-240 32-480 44-720 44S240 60 0 28z" fill="currentColor" />
-        </svg>
       </div>
     </section>
   );

@@ -3,9 +3,11 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/dashboard/Sidebar';
 import Topbar from '../components/dashboard/Topbar';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../i18n/I18nContext';
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const { setLang } = useTranslation();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState('');
@@ -49,6 +51,9 @@ const DashboardLayout = () => {
           email: currentUser.email || '',
         };
         setProfile(resolvedProfile);
+        if (resolvedProfile.preferred_language) {
+          setLang(resolvedProfile.preferred_language);
+        }
 
         const savedMode = localStorage.getItem(`nhfas-dashboard-mode:${currentUser.id}`);
         setIsClientMode(savedMode ? savedMode === 'client' : resolvedProfile.role === 'client');
@@ -63,7 +68,7 @@ const DashboardLayout = () => {
     return () => {
       isCurrent = false;
     };
-  }, []);
+  }, [setLang]);
 
   const toggleMode = () => {
     setIsClientMode((currentMode) => {

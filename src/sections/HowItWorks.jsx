@@ -1,42 +1,45 @@
 import React from 'react';
 import { Search, ClipboardList, Shield, MapPin, CheckCircle } from 'lucide-react';
+import { useTranslation } from '../i18n/I18nContext';
 
 const heroImage = '/illustrations/workflow.svg';
 
 const HowItWorks = () => {
+  const { t } = useTranslation();
+
   const steps = [
     {
       icon: <Search className="w-6 h-6" />,
-      title: '1. Find a Service',
-      desc: 'Search and choose what you need.',
+      title: t('hiw.step1_title'),
+      desc: t('hiw.step1_desc'),
       color: 'text-brand-green',
       bg: 'bg-green-100'
     },
     {
       icon: <ClipboardList className="w-6 h-6" />,
-      title: '2. Post & Confirm',
-      desc: 'Share the job details and confirm the agreed scope.',
+      title: t('hiw.step2_title'),
+      desc: t('hiw.step2_desc'),
       color: 'text-blue-500',
       bg: 'bg-blue-100'
     },
     {
       icon: <Shield className="w-6 h-6" />,
-      title: '3. Track Escrow',
-      desc: 'Review the escrow status linked to your job.',
+      title: t('hiw.step3_title'),
+      desc: t('hiw.step3_desc'),
       color: 'text-amber-500',
       bg: 'bg-amber-100'
     },
     {
       icon: <MapPin className="w-6 h-6" />,
-      title: '4. Track Progress',
-      desc: 'See job status updates and location when it is shared.',
+      title: t('hiw.step4_title'),
+      desc: t('hiw.step4_desc'),
       color: 'text-brand-purple',
       bg: 'bg-purple-100'
     },
     {
       icon: <CheckCircle className="w-6 h-6 text-white" />,
-      title: '5. Complete & Review',
-      desc: 'Confirm completion and leave a review.',
+      title: t('hiw.step5_title'),
+      desc: t('hiw.step5_desc'),
       color: 'text-white',
       bg: 'bg-brand-green',
       isFinal: true
@@ -52,68 +55,37 @@ const HowItWorks = () => {
           <div className="w-full lg:w-3/5">
             <div className="flex items-center gap-4 mb-3">
               <div className="h-0.5 w-12 bg-brand-green"></div>
-              <span className="text-brand-green font-semibold text-sm uppercase tracking-wider">How It Works</span>
+              <span className="text-brand-green font-semibold text-sm uppercase tracking-wider">{t('hiw.tag')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-brand-navy mb-4">
-              Get Your Job Done<br />in 5 Simple Steps
+              {t('hiw.title_line1')}<br />{t('hiw.title_line2')}
             </h2>
             <p className="text-slate-500 text-lg mb-12">
-              From service discovery through completion, keep job details and updates together.
+              {t('hiw.step1_desc')}
             </p>
 
-            <div className="relative">
-              {/* Connecting Line (desktop only) */}
-              <div className="hidden md:block absolute top-8 left-8 right-8 h-0.5 bg-slate-100 -z-10"></div>
-              
-              <div className="flex flex-col md:flex-row justify-between gap-8 md:gap-4">
-                {steps.map((step, idx) => (
-                  <div key={idx} className="flex flex-row md:flex-col items-start md:items-center text-left md:text-center relative">
-                    {/* Connecting line for mobile */}
-                    {idx !== steps.length - 1 && (
-                      <div className="md:hidden absolute top-16 left-8 bottom-[-2rem] w-0.5 bg-slate-100 -z-10"></div>
-                    )}
-                    
-                    <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-0 md:mb-4 flex-shrink-0 z-10 shadow-sm ${step.bg} ${step.color}`}>
-                      {step.icon}
-                    </div>
-                    
-                    <div className="ml-4 md:ml-0 mt-2 md:mt-0">
-                      <h3 className="text-sm font-bold text-slate-800 mb-1">{step.title}</h3>
-                      <p className="text-xs text-slate-500 leading-relaxed max-w-[140px]">{step.desc}</p>
-                    </div>
-
-                    {/* Desktop arrow */}
-                    {idx !== steps.length - 1 && (
-                      <div className="hidden md:block absolute top-8 -right-4 text-slate-300">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </div>
-                    )}
+            <div className="space-y-6">
+              {steps.map((step, idx) => (
+                <div key={idx} className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-xl ${step.bg} ${step.color} flex items-center justify-center font-bold`}>
+                    {step.icon}
                   </div>
-                ))}
-              </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-brand-navy">{step.title}</h3>
+                    <p className="text-slate-500 text-sm mt-1">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Image */}
-          <div className="w-full lg:w-2/5 relative">
-            <div className="relative rounded-2xl overflow-hidden shadow-xl">
-              <img 
-                src={heroImage} 
-                alt="NHFAS service and logistics coordination" 
-                className="w-full h-auto object-cover"
-              />
-              <div className="absolute top-6 right-6 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm transform rotate-3 border border-white">
-                <span className="font-bold text-brand-navy block">Your Project.</span>
-                <span className="font-bold text-brand-green block">Our Priority.</span>
-              </div>
+          {/* Illustration */}
+          <div className="w-full lg:w-2/5">
+            <div className="relative rounded-3xl overflow-hidden border border-slate-100 shadow-xl bg-slate-50 p-6">
+              <img src={heroImage} alt="How NHFAS Works" className="w-full h-auto" />
             </div>
-            {/* Decorative background shape */}
-            <div className="absolute -inset-4 bg-brand-softBlue rounded-2xl -z-10 transform -rotate-3"></div>
           </div>
         </div>
-
       </div>
     </section>
   );

@@ -3,9 +3,11 @@ import { ArrowRight, Eye, EyeOff, Save, Wrench } from 'lucide-react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
+import { useTranslation } from '../i18n/I18nContext';
 
 const ProviderServices = () => {
   const { user, isClientMode } = useOutletContext();
+  const { t } = useTranslation();
   const [form, setForm] = useState({ bio: '', service_radius_km: '15', is_searchable: true });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -23,7 +25,7 @@ const ProviderServices = () => {
 
       if (!isCurrent) return;
       if (loadError) {
-        setError('Your provider profile could not be loaded. Please try again.');
+        setError(t('services_page.error_load'));
       } else if (data) {
         setForm({
           bio: data.bio || '',
@@ -36,7 +38,7 @@ const ProviderServices = () => {
 
     load();
     return () => { isCurrent = false; };
-  }, [user.id]);
+  }, [user.id, t]);
 
   const saveProfile = async (event) => {
     event.preventDefault();
@@ -44,7 +46,7 @@ const ProviderServices = () => {
     setFeedback('');
     const radius = Number(form.service_radius_km);
     if (!Number.isFinite(radius) || radius <= 0 || radius > 500) {
-      setError('Enter a service radius between 1 and 500 km.');
+      setError(t('services_page.error_radius'));
       return;
     }
 
@@ -59,27 +61,27 @@ const ProviderServices = () => {
       }, { onConflict: 'user_id' });
     setSaving(false);
 
-    if (saveError) setError('Your provider profile could not be saved. Please try again.');
-    else setFeedback('Your provider profile has been saved.');
+    if (saveError) setError(t('services_page.error_save'));
+    else setFeedback(t('services_page.saved'));
   };
 
   if (isClientMode) {
     return (
       <div className="mx-auto max-w-3xl rounded-xl border border-slate-200 bg-white p-8">
-        <h1 className="text-2xl font-extrabold text-brand-navy">Provider services</h1>
-        <p className="mt-2 text-sm text-slate-600">Switch to Provider workspace to manage your public profile.</p>
+        <h1 className="text-2xl font-extrabold text-brand-navy">{t('nav.services')}</h1>
+        <p className="mt-2 text-sm text-slate-600">{t('services_page.switch_provider_hint')}</p>
       </div>
     );
   }
 
-  if (loading) return <p className="py-12 text-sm text-slate-500" role="status">Loading your service profile...</p>;
+  if (loading) return <p className="py-12 text-sm text-slate-500" role="status">{t('common.loading')}</p>;
 
   return (
     <div className="mx-auto max-w-4xl space-y-7">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-green">Provider workspace</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-brand-navy">Services and profile</h1>
-        <p className="mt-2 max-w-2xl text-slate-500">Tell clients what you do and control whether your profile appears in provider searches.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-green">{t('nav.provider_workspace')}</p>
+        <h1 className="mt-2 text-3xl font-extrabold text-brand-navy">{t('services_page.title')}</h1>
+        <p className="mt-2 max-w-2xl text-slate-500">{t('services_page.desc')}</p>
       </header>
 
       {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{error}</p>}
@@ -87,20 +89,20 @@ const ProviderServices = () => {
 
       <form onSubmit={saveProfile} className="space-y-6 rounded-xl border border-slate-200 bg-white p-5 sm:p-7">
         <label className="block space-y-2 text-sm font-semibold text-slate-700">
-          About your services
+          {t('services_page.about_services')}
           <textarea
             rows={5}
             maxLength={1200}
             value={form.bio}
             onChange={(event) => setForm((current) => ({ ...current, bio: event.target.value }))}
-            placeholder="Describe the work you offer, your experience, and useful details for clients."
+            placeholder={t('services_page.bio_placeholder')}
             className="block w-full rounded-lg border border-slate-300 px-3 py-3 font-normal focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20"
           />
-          <span className="block text-xs font-normal text-slate-400">{form.bio.length}/1200 characters</span>
+          <span className="block text-xs font-normal text-slate-400">{form.bio.length}/1200 {t('services_page.characters')}</span>
         </label>
 
         <label className="block max-w-sm space-y-2 text-sm font-semibold text-slate-700">
-          Service radius (km)
+          {t('services_page.radius_label')}
           <input
             type="number"
             min="1"
@@ -122,23 +124,23 @@ const ProviderServices = () => {
           <span>
             <span className="flex items-center gap-2 font-semibold text-brand-navy">
               {form.is_searchable ? <Eye className="h-4 w-4 text-emerald-700" /> : <EyeOff className="h-4 w-4 text-slate-500" />}
-              Show my profile in provider search
+              {t('services_page.show_profile')}
             </span>
             <span className="mt-1 block text-sm leading-5 text-slate-500">
-              Turning this off hides your profile from provider search. It does not change active job assignments.
+              {t('services_page.show_profile_desc')}
             </span>
           </span>
         </label>
 
         <div className="flex flex-wrap gap-3">
           <Button type="submit" disabled={saving} className="gap-2">
-            <Save className="h-4 w-4" /> {saving ? 'Saving...' : 'Save profile'}
+            <Save className="h-4 w-4" /> {saving ? t('settings.updating') : t('common.save')}
           </Button>
           <Button as={Link} to="/dashboard/find-me" variant="outline" className="gap-2">
-            <Wrench className="h-4 w-4" /> Manage location availability
+            <Wrench className="h-4 w-4" /> {t('services_page.manage_location')}
           </Button>
           <Link to="/dashboard/verification" className="inline-flex items-center gap-2 self-center text-sm font-semibold text-brand-green">
-            Verification status <ArrowRight className="h-4 w-4" />
+            {t('nav.verification')} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </form>

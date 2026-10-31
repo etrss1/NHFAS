@@ -4,7 +4,10 @@ import Home from './pages/Home';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import CareersPage from './pages/CareersPage';
+import BlogPage from './pages/BlogPage';
+import HelpCenterPage from './pages/HelpCenterPage';
+import TrustSafetyPage from './pages/TrustSafetyPage';
 import LegalPage from './pages/LegalPage';
 import NotFound from './pages/NotFound';
 import CookieConsentBanner from './components/CookieConsentBanner';
@@ -53,10 +56,10 @@ import DisputesTab from './admin/sections/DisputesTab';
 import AuctionsTab from './admin/sections/AuctionsTab';
 import InsuranceTab from './admin/sections/InsuranceTab';
 import FinanceTab from './admin/sections/FinanceTab';
+import PricingTab from './admin/sections/PricingTab';
 import CredentialsTab from './admin/sections/CredentialsTab';
 import FleetTab from './admin/sections/FleetTab';
 import MessagesTab from './admin/sections/MessagesTab';
-import PricingTab from './admin/sections/PricingTab';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -110,20 +113,20 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/careers" element={<PlaceholderPage title="Careers" />} />
-          <Route path="/blog" element={<PlaceholderPage title="Blog" />} />
+          <Route path="/careers" element={<CareersPage />} />
+          <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/services/handyman" element={<ServiceLandingPage serviceId="handyman" />} />
           <Route path="/services/artisans" element={<ServiceLandingPage serviceId="artisans" />} />
           <Route path="/services/heavy-haulage" element={<ServiceLandingPage serviceId="heavy-haulage" />} />
           <Route path="/services/equipment" element={<ServiceLandingPage serviceId="equipment" />} />
           <Route path="/faq" element={<FAQPage />} />
-          <Route path="/help-center" element={<PlaceholderPage title="Help Center" />} />
+          <Route path="/help-center" element={<HelpCenterPage />} />
           <Route path="/terms" element={<LegalPage type="terms" />} />
           <Route path="/terms-and-conditions" element={<LegalPage type="terms" />} />
           <Route path="/privacy" element={<LegalPage type="privacy" />} />
           <Route path="/cookies" element={<LegalPage type="cookies" />} />
-          <Route path="/trust-safety" element={<PlaceholderPage title="Trust & Safety" />} />
+          <Route path="/trust-safety" element={<TrustSafetyPage />} />
           <Route path="/services/auction" element={<AuctionLandingPage />} />
           <Route path="/auction/:auctionId" element={<AuctionPage />} />
         </Route>

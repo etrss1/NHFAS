@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Menu, X, ArrowRight } from 'lucide-react';
+import { Search, Menu, X, ArrowRight, Globe } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { cn } from '../lib/utils';
+import { useTranslation } from '../i18n/I18nContext';
 
 const Navbar = () => {
+  const { t, lang, setLang, languages } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -44,11 +46,10 @@ const Navbar = () => {
   }, [location.pathname, location.hash]);
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Services', href: '/#services' },
-    { name: 'How It Works', href: '/#how-it-works' },
-    { name: 'Marketplace', href: '/search' },
-    { name: 'About Us', href: '/about' },
+    { name: 'Home', label: t('nav.dashboard') === 'Dashboard' ? 'Home' : t('nav.dashboard'), href: '/' },
+    { name: 'Services', label: t('nav.services'), href: '/#services' },
+    { name: 'Marketplace', label: t('nav.marketplace'), href: '/search' },
+    { name: 'About Us', label: t('nav.profile') === 'Profile' ? 'About Us' : t('nav.profile'), href: '/about' },
   ];
 
   return (
@@ -85,20 +86,20 @@ const Navbar = () => {
                   activeLink === link.name ? "text-brand-navy border-b-2 border-brand-green pb-1" : "text-slate-500"
                 )}
               >
-                {link.name}
+                {link.label}
               </Link>
             ))}
           </div>
 
           {/* Actions */}
           <div className="hidden md:flex items-center space-x-4 flex-1 justify-end">
-            <form onSubmit={handleSearch} role="search" className="relative flex h-10 w-full max-w-[400px] items-center justify-end">
+            <form onSubmit={handleSearch} role="search" className="relative flex h-10 w-full max-w-[340px] items-center justify-end">
               <input
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search services, artisans..."
-                aria-label="Search services and providers"
+                placeholder={t('common.search')}
+                aria-label={t('common.search')}
                 className={cn(
                   "absolute right-0 h-full bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-green/50 focus:border-brand-green transition-all duration-300 ease-in-out",
                   isSearchOpen ? "w-full pl-5 pr-12 opacity-100" : "w-10 px-0 opacity-0 border-transparent pointer-events-none"
@@ -118,22 +119,55 @@ const Navbar = () => {
                 {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
               </button>
             </form>
+
+            {/* Language Switcher */}
+            <div className="relative flex items-center">
+              <label htmlFor="navbar-lang-select" className="sr-only">{t('common.language')}</label>
+              <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                <Globe className="h-3.5 w-3.5 text-slate-500" />
+                <select
+                  id="navbar-lang-select"
+                  value={lang}
+                  onChange={(e) => setLang(e.target.value)}
+                  className="bg-transparent text-xs font-semibold text-slate-700 outline-none cursor-pointer"
+                  aria-label={t('common.language')}
+                >
+                  {languages.map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             
             <div className={cn(
-              "flex items-center space-x-4 transition-all duration-300 origin-right flex-shrink-0",
+              "flex items-center space-x-3 transition-all duration-300 origin-right flex-shrink-0",
               isSearchOpen ? "opacity-0 w-0 overflow-hidden pointer-events-none scale-x-0 ml-0 space-x-0" : "opacity-100 w-auto scale-x-100"
             )}>
-              <Button variant="outline" size="sm" className="font-semibold px-6 whitespace-nowrap" onClick={() => navigate('/login')}>
-                Log In
+              <Button variant="outline" size="sm" className="font-semibold px-4 whitespace-nowrap" onClick={() => navigate('/login')}>
+                {t('common.sign_in')}
               </Button>
-              <Button variant="primary" size="sm" className="font-semibold px-6 whitespace-nowrap" onClick={() => navigate('/signup')}>
-                Sign Up
+              <Button variant="primary" size="sm" className="font-semibold px-4 whitespace-nowrap" onClick={() => navigate('/signup')}>
+                {t('common.sign_up')}
               </Button>
             </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-700 outline-none"
+              aria-label={t('common.language')}
+            >
+              {languages.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -158,11 +192,11 @@ const Navbar = () => {
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search services or providers"
-                aria-label="Search services and providers"
+                placeholder={t('common.search')}
+                aria-label={t('common.search')}
                 className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-12 text-sm focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/30"
               />
-              <button type="submit" aria-label="Search" className="absolute right-5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green">
+              <button type="submit" aria-label={t('common.search')} className="absolute right-5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green">
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
@@ -179,12 +213,12 @@ const Navbar = () => {
                   activeLink === link.name ? "text-brand-green bg-green-50" : "text-slate-700 hover:bg-slate-50 hover:text-brand-navy"
                 )}
               >
-                {link.name}
+                {link.label}
               </Link>
             ))}
             <div className="pt-4 flex flex-col gap-3 px-3">
-              <Button variant="outline" className="w-full justify-center" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}>Log In</Button>
-              <Button variant="primary" className="w-full justify-center" onClick={() => { navigate('/signup'); setIsMobileMenuOpen(false); }}>Sign Up</Button>
+              <Button variant="outline" className="w-full justify-center" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}>{t('common.sign_in')}</Button>
+              <Button variant="primary" className="w-full justify-center" onClick={() => { navigate('/signup'); setIsMobileMenuOpen(false); }}>{t('common.sign_up')}</Button>
             </div>
           </div>
         </div>

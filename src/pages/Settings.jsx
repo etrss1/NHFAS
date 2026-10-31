@@ -3,14 +3,16 @@ import { Link, useNavigate, useOutletContext } from 'react-router-dom';
 import { Check, LogOut, Save, ShieldCheck } from 'lucide-react';
 import { Button } from '../components/Button';
 import { supabase } from '../lib/supabase';
+import { useTranslation, normalizeLangCode } from '../i18n/I18nContext';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
+  const { t, lang, setLang, languages } = useTranslation();
   const { user, profile, setProfile, profileError, isProfileLoading, isClientMode, toggleMode } = useOutletContext();
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
-    preferred_language: 'en',
+    preferred_language: lang || 'en',
     low_literacy_mode: false,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -24,17 +26,24 @@ const SettingsPage = () => {
     setFormData({
       full_name: profile.full_name || '',
       phone: profile.phone || '',
-      preferred_language: profile.preferred_language || 'en',
+      preferred_language: normalizeLangCode(profile.preferred_language || lang || 'en'),
       low_literacy_mode: Boolean(profile.low_literacy_mode),
     });
-  }, [profile]);
+  }, [profile, lang]);
+
+  const handleLanguageSelect = (e) => {
+    const newLang = normalizeLangCode(e.target.value);
+    setFormData((prev) => ({ ...prev, preferred_language: newLang }));
+    // Immediately update UI translations when user changes selection
+    setLang(newLang);
+  };
 
   const handleSaveProfile = async (event) => {
     event.preventDefault();
     setFeedback({ type: '', message: '' });
 
     if (!user) {
-      setFeedback({ type: 'error', message: 'Sign in before updating your profile.' });
+      setFeedback({ type: 'error', message: t('settings.error_sign_in') });
       return;
     }
 
@@ -55,12 +64,13 @@ const SettingsPage = () => {
 
     setIsSaving(false);
     if (error) {
-      setFeedback({ type: 'error', message: 'Your profile could not be saved. Please try again.' });
+      setFeedback({ type: 'error', message: t('settings.error_save') });
       return;
     }
 
+    setLang(formData.preferred_language);
     setProfile((currentProfile) => ({ ...currentProfile, ...data, email: user.email || '' }));
-    setFeedback({ type: 'success', message: 'Your profile settings have been saved.' });
+    setFeedback({ type: 'success', message: t('settings.profile_saved') });
   };
 
   const handleChangePassword = async (event) => {
@@ -68,11 +78,11 @@ const SettingsPage = () => {
     setFeedback({ type: '', message: '' });
 
     if (password.length < 8) {
-      setFeedback({ type: 'error', message: 'Use a password with at least 8 characters.' });
+      setFeedback({ type: 'error', message: t('settings.error_password') });
       return;
     }
     if (password !== confirmPassword) {
-      setFeedback({ type: 'error', message: 'The passwords do not match.' });
+      setFeedback({ type: 'error', message: t('settings.error_password_match') });
       return;
     }
 
@@ -81,34 +91,34 @@ const SettingsPage = () => {
     setIsChangingPassword(false);
 
     if (error) {
-      setFeedback({ type: 'error', message: 'Your password could not be updated. Please try again.' });
+      setFeedback({ type: 'error', message: error.message || t('common.error') });
       return;
     }
 
     setPassword('');
     setConfirmPassword('');
-    setFeedback({ type: 'success', message: 'Your password has been updated.' });
+    setFeedback({ type: 'success', message: t('common.save') });
   };
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      setFeedback({ type: 'error', message: 'You could not be signed out. Please try again.' });
+      setFeedback({ type: 'error', message: error.message || t('common.error') });
       return;
     }
     navigate('/login');
   };
 
   if (isProfileLoading) {
-    return <div className="mx-auto max-w-4xl rounded-lg border border-slate-200 bg-white p-8 text-sm text-slate-500" role="status">Loading your settings...</div>;
+    return <div className="mx-auto max-w-4xl rounded-lg border border-slate-200 bg-white p-8 text-sm text-slate-500" role="status">{t('common.loading')}</div>;
   }
 
   if (!user) {
     return (
       <div className="mx-auto max-w-4xl rounded-lg border border-slate-200 bg-white p-8 text-center">
-        <h1 className="text-2xl font-bold text-brand-navy">Sign in to manage settings</h1>
-        <p className="mt-2 text-sm text-slate-500">Your profile and preferences are available after you sign in.</p>
-        <Button as={Link} to="/login" variant="primary" className="mt-5">Sign in</Button>
+        <h1 className="text-2xl font-bold text-brand-navy">{t('common.sign_in')}</h1>
+        <p className="mt-2 text-sm text-slate-500">{t('settings.profile_desc')}</p>
+        <Button as={Link} to="/login" variant="primary" className="mt-5">{t('common.sign_in')}</Button>
       </div>
     );
   }
@@ -116,14 +126,14 @@ const SettingsPage = () => {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <header>
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-green">Account</p>
-        <h1 className="mt-2 text-3xl font-extrabold text-brand-navy">Settings</h1>
-        <p className="mt-2 text-slate-500">Manage your profile, dashboard, and account security.</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-green">{t('section.account')}</p>
+        <h1 className="mt-2 text-3xl font-extrabold text-brand-navy">{t('nav.settings')}</h1>
+        <p className="mt-2 text-slate-500">{t('common.general_settings') || 'Manage your profile, dashboard, and account security.'}</p>
       </header>
 
       {profileError && (
         <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900" role="status">
-          Some profile details could not be loaded. You can still try updating your information.
+          {profileError}
         </p>
       )}
       {feedback.message && (
@@ -134,13 +144,13 @@ const SettingsPage = () => {
 
       <section aria-labelledby="profile-settings-heading" className="rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
         <div className="mb-6">
-          <h2 id="profile-settings-heading" className="text-lg font-bold text-brand-navy">Profile information</h2>
-          <p className="mt-1 text-sm text-slate-500">These details appear on your NHFAS account.</p>
+          <h2 id="profile-settings-heading" className="text-lg font-bold text-brand-navy">{t('settings.profile_info')}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t('settings.profile_desc')}</p>
         </div>
         <form onSubmit={handleSaveProfile} className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <label className="block text-sm font-medium text-slate-700">
-              Full name
+              {t('common.full_name')}
               <input
                 required
                 maxLength={120}
@@ -150,7 +160,7 @@ const SettingsPage = () => {
               />
             </label>
             <label className="block text-sm font-medium text-slate-700">
-              Phone number
+              {t('common.phone')}
               <input
                 type="tel"
                 autoComplete="tel"
@@ -160,7 +170,7 @@ const SettingsPage = () => {
               />
             </label>
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
-              Email address
+              {t('common.email')}
               <input
                 type="email"
                 value={user.email || ''}
@@ -171,16 +181,17 @@ const SettingsPage = () => {
           </div>
 
           <label className="block max-w-sm text-sm font-medium text-slate-700">
-            Preferred language
+            {t('settings.preferred_language')}
             <select
               value={formData.preferred_language}
-              onChange={(event) => setFormData({ ...formData, preferred_language: event.target.value })}
+              onChange={handleLanguageSelect}
               className="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20"
             >
-              <option value="en">English</option>
-              <option value="am">Amharic</option>
-              <option value="om">Afaan Oromo</option>
-              <option value="sw">Swahili</option>
+              {languages.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -192,14 +203,14 @@ const SettingsPage = () => {
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-green focus:ring-brand-green"
             />
             <span>
-              <span className="block font-semibold text-slate-800">Use simplified language</span>
-              <span className="mt-1 block text-slate-500">Prefer shorter, clearer wording throughout the platform.</span>
+              <span className="block font-semibold text-slate-800">{t('settings.use_simplified')}</span>
+              <span className="mt-1 block text-slate-500">{t('settings.simplified_desc')}</span>
             </span>
           </label>
 
           <div className="flex justify-end border-t border-slate-100 pt-5">
             <Button type="submit" disabled={isSaving} className="inline-flex items-center gap-2">
-              {isSaving ? 'Saving...' : 'Save profile'}
+              {isSaving ? (t('settings.updating') || 'Saving...') : (t('common.save') || 'Save profile')}
               {isSaving ? <Check className="h-4 w-4 opacity-60" /> : <Save className="h-4 w-4" />}
             </Button>
           </div>
@@ -208,8 +219,8 @@ const SettingsPage = () => {
 
       <section aria-labelledby="workspace-settings-heading" className="rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
         <div>
-          <h2 id="workspace-settings-heading" className="text-lg font-bold text-brand-navy">Dashboard workspace</h2>
-          <p className="mt-1 text-sm text-slate-500">Choose which dashboard view to use on this device.</p>
+          <h2 id="workspace-settings-heading" className="text-lg font-bold text-brand-navy">{t('nav.client_workspace')} / {t('nav.provider_workspace')}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t('settings.profile_desc')}</p>
         </div>
         <div className="mt-5 inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Dashboard workspace">
           <button
@@ -218,7 +229,7 @@ const SettingsPage = () => {
             onClick={() => isClientMode && toggleMode()}
             className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${!isClientMode ? 'bg-brand-navy text-white' : 'text-slate-600 hover:bg-white'}`}
           >
-            Provider
+            {t('settings.provider')}
           </button>
           <button
             type="button"
@@ -226,7 +237,7 @@ const SettingsPage = () => {
             onClick={() => !isClientMode && toggleMode()}
             className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${isClientMode ? 'bg-brand-navy text-white' : 'text-slate-600 hover:bg-white'}`}
           >
-            Client
+            {t('settings.client')}
           </button>
         </div>
       </section>
@@ -237,42 +248,42 @@ const SettingsPage = () => {
             <ShieldCheck className="h-5 w-5" />
           </span>
           <div>
-            <h2 id="security-settings-heading" className="text-lg font-bold text-brand-navy">Account security</h2>
-            <p className="mt-1 text-sm text-slate-500">Update your password or sign out of this device.</p>
+            <h2 id="security-settings-heading" className="text-lg font-bold text-brand-navy">{t('settings.account_security')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t('settings.security_desc')}</p>
           </div>
         </div>
         <form onSubmit={handleChangePassword} className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-medium text-slate-700">
-            New password
+            {t('common.new_password')}
             <input
               type="password"
               minLength={8}
               autoComplete="new-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="At least 8 characters"
+              placeholder={t('settings.password_min_length')}
               className="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20"
             />
           </label>
           <label className="block text-sm font-medium text-slate-700">
-            Confirm new password
+            {t('common.confirm_password')}
             <input
               type="password"
               minLength={8}
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
-              placeholder="Re-enter new password"
+              placeholder={t('settings.reenter_password')}
               className="mt-2 block w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/20"
             />
           </label>
           <div className="flex flex-wrap justify-between gap-3 border-t border-slate-100 pt-5 sm:col-span-2">
             <button type="button" onClick={handleSignOut} className="inline-flex h-10 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-brand-navy">
               <LogOut className="h-4 w-4" />
-              Sign out
+              {t('settings.sign_out')}
             </button>
             <Button type="submit" disabled={isChangingPassword || !password || !confirmPassword} className="inline-flex items-center gap-2">
-              {isChangingPassword ? 'Updating...' : 'Update password'}
+              {isChangingPassword ? t('settings.updating') : t('settings.update_password')}
               <ShieldCheck className="h-4 w-4" />
             </Button>
           </div>

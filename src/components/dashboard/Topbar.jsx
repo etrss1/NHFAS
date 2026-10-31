@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Bell, Mail, Menu, Search } from 'lucide-react';
+import { ArrowRight, Bell, Globe, Mail, Menu, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { useTranslation } from '../../i18n/I18nContext';
 
 const Topbar = ({ fullName, user, onOpenNav }) => {
   const navigate = useNavigate();
+  const { t, lang, setLang, languages } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [showPanel, setShowPanel] = useState(false);
@@ -58,14 +60,15 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
   };
 
   const markAllRead = async () => {
+    const unreadIds = notifications.filter((item) => !item.read_at).map((item) => item.id);
+    if (unreadIds.length === 0) return;
     const now = new Date().toISOString();
-    const { error } = await supabase.from('notifications').update({ read_at: now }).eq('user_id', user.id).is('read_at', null);
+    const { error } = await supabase.from('notifications').update({ read_at: now }).in('id', unreadIds);
     if (error) {
       setNotificationError(`Notifications could not be updated: ${error.message}`);
       return;
     }
-    setNotificationError('');
-    setNotifications((current) => current.map((item) => ({ ...item, read_at: item.read_at || now })));
+    setNotifications((current) => current.map((item) => ({ ...item, read_at: now })));
   };
 
   const handleSearch = (event) => {
@@ -74,6 +77,7 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
     if (!query) return;
     navigate(`/dashboard/search?q=${encodeURIComponent(query)}`);
   };
+
   return (
     <header className="relative bg-white border-b border-slate-200 h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
       <div className="flex flex-1 items-center gap-2 sm:gap-4">
@@ -95,22 +99,39 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
             type="search"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search providers or services"
-            aria-label="Search providers or services"
+            placeholder={t('common.search')}
+            aria-label={t('common.search')}
             className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-11 text-sm transition-all focus:border-brand-green focus:outline-none focus:ring-2 focus:ring-brand-green/50"
           />
-          <button type="submit" aria-label="Search" className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:bg-white hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green">
+          <button type="submit" aria-label={t('common.search')} className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-slate-500 hover:bg-white hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green">
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        {/* Language selector in dashboard Topbar */}
+        <div className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100">
+          <Globe className="h-3.5 w-3.5 text-slate-500" />
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value)}
+            className="bg-transparent text-xs font-semibold text-slate-700 outline-none cursor-pointer"
+            aria-label={t('common.language')}
+          >
+            {languages.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="relative">
           <button
             onClick={() => setShowPanel((open) => !open)}
             aria-label={`Notifications (${unreadCount} unread)`}
-            title="Notifications"
+            title={t('common.notifications_title')}
             className="p-2 text-slate-500 hover:text-brand-navy rounded-full hover:bg-slate-100 relative"
           >
             <Bell className="w-5 h-5" />
@@ -123,9 +144,9 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
           {showPanel && (
             <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-200 bg-white shadow-xl z-50">
               <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-                <p className="text-sm font-bold text-brand-navy">Notifications</p>
+                <p className="text-sm font-bold text-brand-navy">{t('common.notifications_title')}</p>
                 {unreadCount > 0 && (
-                  <button onClick={markAllRead} className="text-xs font-semibold text-brand-green hover:underline">Mark all read</button>
+                  <button onClick={markAllRead} className="text-xs font-semibold text-brand-green hover:underline">{t('common.notifications_mark_all_read') || 'Mark all read'}</button>
                 )}
               </div>
               <div className="max-h-80 overflow-y-auto">
@@ -135,7 +156,7 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
                   </p>
                 )}
                 {notifications.length === 0 ? (
-                  <p className="px-4 py-8 text-center text-sm text-slate-400">No notifications yet.</p>
+                  <p className="px-4 py-8 text-center text-sm text-slate-400">{t('common.notifications_no_notifications') || 'No notifications yet.'}</p>
                 ) : (
                   notifications.map((notification) => (
                     <button
@@ -153,20 +174,20 @@ const Topbar = ({ fullName, user, onOpenNav }) => {
             </div>
           )}
         </div>
-          <button
-            onClick={() => navigate('/dashboard/messages')}
-            className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-brand-navy"
-            aria-label="Job messages"
-            title="Your job messages"
-          >
-            <Mail className="w-5 h-5" />
-          </button>
+        <button
+          onClick={() => navigate('/dashboard/messages')}
+          className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 hover:text-brand-navy"
+          aria-label="Job messages"
+          title={t('nav.messages')}
+        >
+          <Mail className="w-5 h-5" />
+        </button>
         <div className="h-8 w-px bg-slate-200 mx-1"></div>
         <button
           onClick={() => navigate('/dashboard/settings')}
           className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
-          aria-label={`${fullName} — account settings`}
-          title="Account settings"
+          aria-label={`${fullName} — ${t('nav.settings')}`}
+          title={t('nav.settings')}
         >
           <div className="w-8 h-8 rounded-full bg-brand-green/20 text-brand-green flex items-center justify-center font-bold text-sm">
             {initials || '?'}

@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, Wrench, Palette, Truck, Gavel } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { servicesData } from '../data/services';
+import { useTranslation } from '../i18n/I18nContext';
 
 const iconMap = {
   'handyman': Wrench,
@@ -11,17 +12,19 @@ const iconMap = {
 };
 
 const Services = () => {
+  const { t } = useTranslation();
+
   return (
     <section id="services" className="scroll-mt-24 py-20 bg-brand-softBlue">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <div className="flex items-center gap-4 mb-3">
             <div className="h-0.5 w-12 bg-brand-green"></div>
-            <span className="text-brand-green font-semibold text-sm uppercase tracking-wider">Our Services</span>
+            <span className="text-brand-green font-semibold text-sm uppercase tracking-wider">{t('services_sec.tag')}</span>
           </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-navy mb-4">Choose What You Need</h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-brand-navy mb-4">{t('services_sec.title')}</h2>
           <p className="text-slate-500 text-lg max-w-2xl">
-            Whether it's a quick repair, a skilled artisan, or a heavy haul, we've got you covered.
+            {t('services_sec.subtitle')}
           </p>
         </div>
 

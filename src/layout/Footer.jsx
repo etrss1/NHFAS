@@ -1,7 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from '../i18n/I18nContext';
 
 const Footer = () => {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-slate-900 text-white pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,59 +16,50 @@ const Footer = () => {
               <span className="font-extrabold text-2xl tracking-tight text-white">NHFAS</span>
             </div>
             <p className="text-slate-400 text-sm max-w-xs">
-              Connecting customers with skilled professionals, artisans, and heavy haulage operators for real solutions.
+              {t('footer.tagline')}
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Company</h4>
+            <h4 className="font-semibold text-lg mb-4">{t('footer.company')}</h4>
             <ul className="space-y-3 text-slate-400 text-sm">
-              <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/careers" className="hover:text-white transition-colors">Careers</Link></li>
-              <li><Link to="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-              <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
+              <li><Link to="/about" className="hover:text-white transition-colors">{t('footer.about_us')}</Link></li>
+              <li><Link to="/careers" className="hover:text-white transition-colors">{t('footer.careers')}</Link></li>
+              <li><Link to="/blog" className="hover:text-white transition-colors">{t('footer.blog')}</Link></li>
+              <li><Link to="/contact" className="hover:text-white transition-colors">{t('footer.contact')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-lg mb-4">Services</h4>
+            <h4 className="font-semibold text-lg mb-4">{t('footer.services')}</h4>
             <ul className="space-y-3 text-slate-400 text-sm">
-              <li><Link to="/services/handyman" className="hover:text-white transition-colors">Handyman Services</Link></li>
-              <li><Link to="/services/artisans" className="hover:text-white transition-colors">Skilled Artisans</Link></li>
-              <li><Link to="/services/heavy-haulage" className="hover:text-white transition-colors">Heavy Haulage</Link></li>
-              <li><Link to="/services/equipment" className="hover:text-white transition-colors">Equipment Rental</Link></li>
+              <li><Link to="/services/handyman" className="hover:text-white transition-colors">{t('footer.handyman')}</Link></li>
+              <li><Link to="/services/artisans" className="hover:text-white transition-colors">{t('footer.artisans')}</Link></li>
+              <li><Link to="/services/heavy-haulage" className="hover:text-white transition-colors">{t('footer.heavy_haulage')}</Link></li>
+              <li><Link to="/services/equipment" className="hover:text-white transition-colors">{t('footer.equipment')}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-lg mb-4">Support</h4>
+            <h4 className="font-semibold text-lg mb-4">{t('footer.support')}</h4>
             <ul className="space-y-3 text-slate-400 text-sm">
-              <li><Link to="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-              <li><Link to="/help-center" className="hover:text-white transition-colors">Help Center</Link></li>
-              <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-              <li><Link to="/trust-safety" className="hover:text-white transition-colors">Trust & Safety</Link></li>
+              <li><Link to="/faq" className="hover:text-white transition-colors">{t('footer.faq')}</Link></li>
+              <li><Link to="/help-center" className="hover:text-white transition-colors">{t('footer.help_center')}</Link></li>
+              <li><Link to="/terms" className="hover:text-white transition-colors">{t('footer.terms')}</Link></li>
+              <li><Link to="/privacy" className="hover:text-white transition-colors">{t('footer.privacy')}</Link></li>
+              <li><Link to="/cookies" className="hover:text-white transition-colors">{t('footer.cookies')}</Link></li>
+              <li><Link to="/trust-safety" className="hover:text-white transition-colors">{t('footer.trust_safety')}</Link></li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-sm text-center md:text-left">
-            &copy; {new Date().getFullYear()} NHFAS. All rights reserved.
-          </p>
-          <div className="flex items-center space-x-4 text-sm text-slate-400">
-            <a href="https://www.facebook.com/profile.php?id=61594481709392" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-full hover:bg-brand-green hover:text-white transition-colors" aria-label="Facebook">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-              </svg>
-            </a>
-            <a href="https://www.tiktok.com/@nhfas0?_r=1&_t=ZS-99jb2FKxWWv" target="_blank" rel="noopener noreferrer" className="p-2 bg-slate-800 rounded-full hover:bg-brand-green hover:text-white transition-colors" aria-label="TikTok">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
-              </svg>
-            </a>
+        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs">
+          <p>© {new Date().getFullYear()} NHFAS. {t('footer.rights')}</p>
+          <div className="flex gap-6">
+            <Link to="/terms" className="hover:text-slate-400">{t('footer.terms')}</Link>
+            <Link to="/privacy" className="hover:text-slate-400">{t('footer.privacy')}</Link>
+            <Link to="/cookies" className="hover:text-slate-400">{t('footer.cookies')}</Link>
           </div>
         </div>
       </div>

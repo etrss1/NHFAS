@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { Cloud, WifiOff, LoaderCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { getSyncStatus, onSyncStateChange } from '../../lib/syncEngine.js';
+import { getSyncStatus, onSyncStateChange, syncPendingWrites } from '../../lib/syncEngine.js';
 
 export default function SyncStatus() {
   const [status, setStatus] = useState({ unsyncedCount: 0, syncing: false });
@@ -18,7 +18,7 @@ export default function SyncStatus() {
   }, []);
 
   const handleRetry = () => {
-    import('../../lib/syncEngine.js').then(({ syncPendingWrites }) => syncPendingWrites());
+    syncPendingWrites();
   };
 
   if (status.unsyncedCount === 0 && online && !status.syncing) return null;

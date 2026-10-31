@@ -2,8 +2,11 @@ import React from 'react';
 import { ArrowRight, Truck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { useTranslation } from '../i18n/I18nContext';
 
 const FinalCTA = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative py-24 bg-brand-navy overflow-hidden">
       {/* Background Image & Overlay */}
@@ -25,19 +28,19 @@ const FinalCTA = () => {
           </div>
 
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-            Ready to <span className="text-brand-green">Get Started?</span>
+            {t('cta.ready_title')}
           </h2>
           <p className="text-lg text-slate-300 mb-10 max-w-xl leading-relaxed">
-            Find services, post a job, or create a provider account to get started.
+            {t('cta.ready_desc')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Button as={Link} to="/services/handyman" size="lg" className="justify-center group">
-              Find a Service
+              {t('hero.find_service')}
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button as={Link} to="/signup" variant="outline" size="lg" className="justify-center border-slate-600 text-white hover:bg-slate-800 hover:text-white focus:ring-slate-600 group">
-              Become a Provider
+              {t('hero.become_provider')}
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>

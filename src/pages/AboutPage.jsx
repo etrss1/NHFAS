@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/Button';
+import { useTranslation } from '../i18n/I18nContext';
 
 const pillars = [
   {
@@ -258,7 +259,9 @@ const preparationChecklist = [
   },
 ];
 
-const AboutPage = () => (
+const AboutPage = () => {
+  const { t } = useTranslation();
+  return (
   <div className="flex-1 bg-white font-sans">
     <section className="relative overflow-hidden bg-brand-navy text-white">
       <div className="absolute inset-0 opacity-20">
@@ -268,10 +271,10 @@ const AboutPage = () => (
       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="max-w-3xl">
           <h1 className="mb-6 text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl">
-            One platform for skilled work and heavy transport.
+            {t('about.hero_title')}
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-            The National Heavy Freight & Artisan System (NHFAS) is a dual-service marketplace vision for connecting local artisans, clients, and commercial logistics operators across Ethiopia.
+            {t('about.hero_desc')}
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button as={Link} to="/services/handyman" size="lg" className="gap-2">
@@ -288,8 +291,8 @@ const AboutPage = () => (
     <section className="bg-brand-softBlue py-16 sm:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <div>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">Our vision</p>
-          <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">Make fragmented services easier to find, book, and trust.</h2>
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">{t('about.vision_tag')}</p>
+          <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">{t('about.vision_title')}</h2>
         </div>
         <div className="space-y-5 text-lg leading-relaxed text-slate-600">
           <p>
@@ -305,8 +308,8 @@ const AboutPage = () => (
     <section className="py-16 sm:py-20">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8">
         <div>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">Our role in this project</p>
-          <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">We build the bridge between people, services, and transport.</h2>
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">{t('about.role_tag')}</p>
+          <h2 className="text-3xl font-extrabold leading-tight sm:text-4xl">{t('about.role_title')}</h2>
         </div>
         <div className="space-y-5 text-lg leading-relaxed text-slate-600">
           <p>
@@ -325,8 +328,8 @@ const AboutPage = () => (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 max-w-2xl">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">How we bring it together</p>
-          <h2 className="text-3xl font-extrabold sm:text-4xl">Four connected service pillars</h2>
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-brand-green">{t('about.pillars_tag')}</p>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">{t('about.pillars_title')}</h2>
           <p className="mt-4 text-lg leading-relaxed text-slate-600">A shared platform can make local services and commercial hauling easier to coordinate—without losing sight of trust, safety, and fair value.</p>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -615,5 +618,6 @@ const AboutPage = () => (
     </section>
   </div>
 );
+};
 
 export default AboutPage;
