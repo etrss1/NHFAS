@@ -51,7 +51,8 @@ const FAQPage = () => {
   const [aiError, setAiError] = useState('');
 
   const buildFaqContext = useMemo(() => {
-    return faqCategories.flatMap((category) =>
+    // Limit to 8 most recent/important FAQ items to stay within edge function limit
+    const allItems = faqCategories.flatMap((category) =>
       category.items.map((item) => ({
         category: category.title,
         question: item.question,
@@ -59,6 +60,7 @@ const FAQPage = () => {
         featureRef: item.relatedFeatureRef,
       }))
     );
+    return allItems.slice(0, 8); // <-- limit to 8 items max
   }, []);
 
   const askAiAssistant = async (e) => {
