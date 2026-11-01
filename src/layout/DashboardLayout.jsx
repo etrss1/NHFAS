@@ -12,7 +12,6 @@ const DashboardLayout = () => {
   const [profile, setProfile] = useState(null);
   const [profileError, setProfileError] = useState('');
   const [isProfileLoading, setIsProfileLoading] = useState(true);
-  const [isClientMode, setIsClientMode] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
@@ -54,9 +53,6 @@ const DashboardLayout = () => {
         if (resolvedProfile.preferred_language) {
           setLang(resolvedProfile.preferred_language);
         }
-
-        const savedMode = localStorage.getItem(`nhfas-dashboard-mode:${currentUser.id}`);
-        setIsClientMode(savedMode ? savedMode === 'client' : resolvedProfile.role === 'client');
       } catch {
         if (isCurrent) setProfileError('Your profile could not be loaded from NHFAS.');
       } finally {
@@ -70,15 +66,7 @@ const DashboardLayout = () => {
     };
   }, [setLang]);
 
-  const toggleMode = () => {
-    setIsClientMode((currentMode) => {
-      const nextMode = !currentMode;
-      if (user) {
-        localStorage.setItem(`nhfas-dashboard-mode:${user.id}`, nextMode ? 'client' : 'provider');
-      }
-      return nextMode;
-    });
-  };
+  const isClientMode = profile?.role === 'client';
 
   if (isProfileLoading) {
     return (
@@ -118,7 +106,6 @@ const DashboardLayout = () => {
             profileError,
             isProfileLoading,
             isClientMode,
-            toggleMode,
           }} />
         </main>
       </div>

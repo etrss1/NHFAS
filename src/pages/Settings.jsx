@@ -8,7 +8,7 @@ import { useTranslation, normalizeLangCode } from '../i18n/I18nContext';
 const SettingsPage = () => {
   const navigate = useNavigate();
   const { t, lang, setLang, languages } = useTranslation();
-  const { user, profile, setProfile, profileError, isProfileLoading, isClientMode, toggleMode } = useOutletContext();
+  const { user, profile, setProfile, profileError, isProfileLoading } = useOutletContext();
   const [formData, setFormData] = useState({
     full_name: '',
     phone: '',
@@ -215,31 +215,6 @@ const SettingsPage = () => {
             </Button>
           </div>
         </form>
-      </section>
-
-      <section aria-labelledby="workspace-settings-heading" className="rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
-        <div>
-          <h2 id="workspace-settings-heading" className="text-lg font-bold text-brand-navy">{t('nav.client_workspace')} / {t('nav.provider_workspace')}</h2>
-          <p className="mt-1 text-sm text-slate-500">{t('settings.profile_desc')}</p>
-        </div>
-        <div className="mt-5 inline-flex rounded-lg border border-slate-200 bg-slate-50 p-1" role="group" aria-label="Dashboard workspace">
-          <button
-            type="button"
-            aria-pressed={!isClientMode}
-            onClick={() => isClientMode && toggleMode()}
-            className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${!isClientMode ? 'bg-brand-navy text-white' : 'text-slate-600 hover:bg-white'}`}
-          >
-            {t('settings.provider')}
-          </button>
-          <button
-            type="button"
-            aria-pressed={isClientMode}
-            onClick={() => !isClientMode && toggleMode()}
-            className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${isClientMode ? 'bg-brand-navy text-white' : 'text-slate-600 hover:bg-white'}`}
-          >
-            {t('settings.client')}
-          </button>
-        </div>
       </section>
 
       <section aria-labelledby="security-settings-heading" className="rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
