@@ -343,7 +343,7 @@ const FAQPage = () => {
           </form>
 
           {aiAnswer && (
-            <section className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+            <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
               <div className="flex items-start gap-2 mb-2">
                 <Bot className="h-4 w-4 text-brand-green shrink-0" aria-hidden="true" />
                 <h3 className="text-sm font-bold text-brand-green">AI Answer</h3>
@@ -354,7 +354,7 @@ const FAQPage = () => {
         </section>
 
         <section aria-labelledby="faq-results-heading" className="min-w-0">
-          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-brand-green">Knowledge base</p>
               <h2 id="faq-results-heading" className="mt-1 text-2xl font-extrabold text-brand-navy sm:text-3xl">
