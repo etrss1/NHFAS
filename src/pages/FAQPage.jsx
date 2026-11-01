@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Bot, ChevronDown, ChevronUp, CircleHelp, ClipboardList, Link2, LoaderCircle, RotateCcw, Search, ShieldCheck, Truck, Users, Wallet, Wrench, X } from 'lucide-react';
+import { ArrowRight, Bot, ChevronDown, ChevronUp, CircleHelp, ClipboardList, Link2, LoaderCircle, RotateCcw, Search, ShieldCheck, Truck, Users, Wallet, Wrench, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { faqCategories } from '../data/faqData';
 import { supabase } from '../lib/supabase';
