@@ -44,6 +44,9 @@ const FAQPage = () => {
   const [openItems, setOpenItems] = useState(() => new Set(linkedFAQ ? [linkedFAQ.item.id] : []));
   const [copyFeedback, setCopyFeedback] = useState({ itemId: '', message: '', isError: false });
 
+  // Tab state: 'faq' or 'ai'
+  const [activeTab, setActiveTab] = useState('faq');
+
   // AI Assistant state
   const [aiQuestion, setAiQuestion] = useState('');
   const [aiAnswer, setAiAnswer] = useState('');
@@ -173,6 +176,29 @@ const FAQPage = () => {
     }
   };
 
+  const handleTabKeyDown = (event) => {
+    const tabOrder = ['faq', 'ai'];
+    const currentIndex = tabOrder.indexOf(activeTab);
+    let nextIndex;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % tabOrder.length;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + tabOrder.length) % tabOrder.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = tabOrder.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    const nextTab = tabOrder[nextIndex];
+    setActiveTab(nextTab);
+    document.getElementById(`${nextTab}-tab`)?.focus();
+  };
+
   return (
     <div className="flex-1 bg-slate-50 font-sans">
       <header className="bg-brand-navy px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
@@ -294,206 +320,246 @@ const FAQPage = () => {
           </section>
         </aside>
 
-        {/* AI Assistant Section */}
-        <section aria-labelledby="ai-assistant-heading" className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
-          <div className="flex items-start gap-3 mb-5">
-            <Bot className="h-5 w-5 text-brand-green shrink-0" aria-hidden="true" />
-            <div>
-              <h2 id="ai-assistant-heading" className="text-lg font-bold text-brand-navy">
-                AI FAQ Assistant
-              </h2>
-              <p className="mt-1 text-sm text-slate-500">
-                Ask a question about NHFAS services and get an AI-generated answer based on our knowledge base.
-              </p>
-            </div>
+        <div className="min-w-0">
+          <div
+            role="tablist"
+            aria-label="FAQ tools"
+            onKeyDown={handleTabKeyDown}
+            className="mb-6 flex border-b border-slate-200"
+          >
+            <button
+              type="button"
+              id="faq-tab"
+              role="tab"
+              aria-selected={activeTab === 'faq'}
+              aria-controls="faq-panel"
+              tabIndex={activeTab === 'faq' ? 0 : -1}
+              onClick={() => setActiveTab('faq')}
+              className={`min-h-12 border-b-2 px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-green ${activeTab === 'faq' ? 'border-brand-green text-brand-navy' : 'border-transparent text-slate-500 hover:text-brand-navy'}`}
+            >
+              Frequently asked questions
+            </button>
+            <button
+              type="button"
+              id="ai-tab"
+              role="tab"
+              aria-selected={activeTab === 'ai'}
+              aria-controls="ai-panel"
+              tabIndex={activeTab === 'ai' ? 0 : -1}
+              onClick={() => setActiveTab('ai')}
+              className={`min-h-12 border-b-2 px-4 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-green ${activeTab === 'ai' ? 'border-brand-green text-brand-navy' : 'border-transparent text-slate-500 hover:text-brand-navy'}`}
+            >
+              AI assistant
+            </button>
           </div>
 
-          {aiError && (
-            <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-              {aiError}
-            </p>
-          )}
-
-          <form onSubmit={askAiAssistant} className="space-y-3">
-            <div className="relative">
-              <label htmlFor="ai-question" className="sr-only">
-                Ask a question
-              </label>
-              <input
-                id="ai-question"
-                type="text"
-                value={aiQuestion}
-                onChange={(event) => setAiQuestion(event.target.value)}
-                placeholder="e.g. How do I post a job? What is escrow?"
-                className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/10"
-                disabled={aiLoading}
-              />
-              {aiLoading && (
-                <LoaderCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-brand-green" aria-label="Loading" />
-              )}
-            </div>
-            <Button
-              type="submit"
-              disabled={aiLoading || !aiQuestion.trim()}
-              className="w-full sm:w-auto gap-2"
-            >
-              {aiLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Bot size={14} />}
-              {aiLoading ? 'Thinking…' : 'Ask AI'}
-            </Button>
-          </form>
-
-          {aiAnswer && (
-            <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-              <div className="flex items-start gap-2 mb-2">
-                <Bot className="h-4 w-4 text-brand-green shrink-0" aria-hidden="true" />
-                <h3 className="text-sm font-bold text-brand-green">AI Answer</h3>
+          {activeTab === 'ai' && (
+            <section id="ai-panel" role="tabpanel" aria-labelledby="ai-tab" tabIndex={0} className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+              <div className="mb-5 flex items-start gap-3">
+                <Bot className="h-5 w-5 shrink-0 text-brand-green" aria-hidden="true" />
+                <div>
+                  <h2 id="ai-assistant-heading" className="text-lg font-bold text-brand-navy">
+                    AI FAQ Assistant
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Ask a question about NHFAS services and get an AI-generated answer based on our knowledge base.
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-slate-800 leading-relaxed">{aiAnswer}</p>
+
+              {aiError && (
+                <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {aiError}
+                </p>
+              )}
+
+              <form onSubmit={askAiAssistant} className="space-y-3">
+                <div className="relative">
+                  <label htmlFor="ai-question" className="sr-only">
+                    Ask a question
+                  </label>
+                  <input
+                    id="ai-question"
+                    type="text"
+                    value={aiQuestion}
+                    onChange={(event) => setAiQuestion(event.target.value)}
+                    placeholder="e.g. How do I post a job? What is escrow?"
+                    className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/10"
+                    disabled={aiLoading}
+                  />
+                  {aiLoading && (
+                    <LoaderCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-brand-green" aria-label="Loading" />
+                  )}
+                </div>
+                <Button
+                  type="submit"
+                  disabled={aiLoading || !aiQuestion.trim()}
+                  className="w-full gap-2 sm:w-auto"
+                >
+                  {aiLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Bot size={14} />}
+                  {aiLoading ? 'Thinking…' : 'Ask AI'}
+                </Button>
+              </form>
+
+              {aiAnswer && (
+                <section className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                  <div className="mb-2 flex items-start gap-2">
+                    <Bot className="h-4 w-4 shrink-0 text-brand-green" aria-hidden="true" />
+                    <h3 className="text-sm font-bold text-brand-green">AI Answer</h3>
+                  </div>
+                  <p className="text-sm leading-relaxed text-slate-800">{aiAnswer}</p>
+                </section>
+              )}
             </section>
           )}
-        </section>
 
-        <section aria-labelledby="faq-results-heading" className="min-w-0">
-          <div className="mb-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wider text-brand-green">Knowledge base</p>
-              <h2 id="faq-results-heading" className="mt-1 text-2xl font-extrabold text-brand-navy sm:text-3xl">
-                Frequently asked questions
-              </h2>
-              <p className="mt-2 text-sm text-slate-500" aria-live="polite">
-                {resultCount} {resultCount === 1 ? 'answer' : 'answers'} found
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={toggleAllVisible}
-                disabled={allVisibleIds.length === 0}
-                className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-brand-green hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {allVisibleOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                {allVisibleOpen ? 'Collapse all' : 'Expand all'}
-              </button>
-              {(searchQuery || selectedCategory !== 'all' || selectedRole !== 'all') && (
-                <button
-                  type="button"
-                  onClick={resetFilters}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
-                >
-                  <RotateCcw className="h-4 w-4" /> Reset filters
-                </button>
-              )}
-            </div>
-          </div>
+          {activeTab === 'faq' && (
+            <section id="faq-panel" role="tabpanel" aria-labelledby="faq-tab" tabIndex={0}>
+              <section aria-labelledby="faq-results-heading" className="min-w-0">
+                <div className="mb-3 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-wider text-brand-green">Knowledge base</p>
+                    <h2 id="faq-results-heading" className="mt-1 text-2xl font-extrabold text-brand-navy sm:text-3xl">
+                      Frequently asked questions
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500" aria-live="polite">
+                      {resultCount} {resultCount === 1 ? 'answer' : 'answers'} found
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={toggleAllVisible}
+                      disabled={allVisibleIds.length === 0}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 text-sm font-semibold text-slate-700 transition hover:border-brand-green hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {allVisibleOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      {allVisibleOpen ? 'Collapse all' : 'Expand all'}
+                    </button>
+                    {(searchQuery || selectedCategory !== 'all' || selectedRole !== 'all') && (
+                      <button
+                        type="button"
+                        onClick={resetFilters}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-sm font-semibold text-slate-600 transition hover:bg-white hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
+                      >
+                        <RotateCcw className="h-4 w-4" /> Reset filters
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-          {visibleCategories.length > 0 ? (
-            <div className="space-y-7">
-              {visibleCategories.map((category) => {
-                const Icon = categoryIcons[category.iconName] || CircleHelp;
-                return (
-                  <section key={category.id} aria-labelledby={`category-${category.id}`}>
-                    <div className="mb-3 flex items-start gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-brand-green">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </div>
-                      <div>
-                        <h3 id={`category-${category.id}`} className="font-bold text-brand-navy">{category.title}</h3>
-                        <p className="mt-0.5 text-sm text-slate-500">{category.description}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      {category.items.map((item) => {
-                        const isOpen = openItems.has(item.id);
-                        return (
-                          <article id={`faq-${item.id}`} key={item.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                            <h4>
-                              <button
-                                type="button"
-                                id={`question-${item.id}`}
-                                aria-expanded={isOpen}
-                                aria-controls={`answer-${item.id}`}
-                                onClick={() => toggleItem(item.id)}
-                                className="flex w-full items-center justify-between gap-4 p-5 text-left transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-green"
-                              >
-                                <span className="font-semibold leading-relaxed text-slate-800">{item.question}</span>
-                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
-                                  {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                                </span>
-                              </button>
-                            </h4>
-                            {isOpen && (
-                              <div
-                                id={`answer-${item.id}`}
-                                role="region"
-                                aria-labelledby={`question-${item.id}`}
-                                className="border-t border-slate-100 px-5 pb-5 pt-4"
-                              >
-                                <p className="leading-relaxed text-slate-600">{item.answer}</p>
-                                <div className="mt-4">
-                                  <button
-                                    type="button"
-                                    onClick={() => copyFAQLink(item.id)}
-                                    className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-brand-green hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
-                                  >
-                                    <Link2 className="h-4 w-4" aria-hidden="true" />
-                                    Copy answer link
-                                  </button>
-                                  {copyFeedback.itemId === item.id && (
-                                    <p className={`mt-2 text-sm ${copyFeedback.isError ? 'text-red-700' : 'text-emerald-700'}`} role="status" aria-live="polite">
-                                      {copyFeedback.message}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="mt-4 flex flex-wrap items-center gap-2">
-                                  {item.relatedFeatureRef && (
+                {visibleCategories.length > 0 ? (
+                  <div className="space-y-7">
+                    {visibleCategories.map((category) => {
+                      const Icon = categoryIcons[category.iconName] || CircleHelp;
+                      return (
+                        <section key={category.id} aria-labelledby={`category-${category.id}`}>
+                          <div className="mb-3 flex items-start gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-brand-green">
+                              <Icon className="h-5 w-5" aria-hidden="true" />
+                            </div>
+                            <div>
+                              <h3 id={`category-${category.id}`} className="font-bold text-brand-navy">{category.title}</h3>
+                              <p className="mt-0.5 text-sm text-slate-500">{category.description}</p>
+                            </div>
+                          </div>
+                          <div className="space-y-3">
+                            {category.items.map((item) => {
+                              const isOpen = openItems.has(item.id);
+                              return (
+                                <article id={`faq-${item.id}`} key={item.id} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                                  <h4>
                                     <button
                                       type="button"
-                                      onClick={() => applySearchFilter(item.relatedFeatureRef)}
-                                      className="min-h-11 rounded-full bg-brand-softBlue px-3 py-1 text-xs font-semibold text-brand-navy transition hover:bg-brand-navy hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-green sm:min-h-9"
-                                      aria-label={`Search FAQs for ${item.relatedFeatureRef}`}
+                                      id={`question-${item.id}`}
+                                      aria-expanded={isOpen}
+                                      aria-controls={`answer-${item.id}`}
+                                      onClick={() => toggleItem(item.id)}
+                                      className="flex w-full items-center justify-between gap-4 p-5 text-left transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-green"
                                     >
-                                      {item.relatedFeatureRef}
+                                      <span className="font-semibold leading-relaxed text-slate-800">{item.question}</span>
+                                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                                        {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                      </span>
                                     </button>
+                                  </h4>
+                                  {isOpen && (
+                                    <div
+                                      id={`answer-${item.id}`}
+                                      role="region"
+                                      aria-labelledby={`question-${item.id}`}
+                                      className="border-t border-slate-100 px-5 pb-5 pt-4"
+                                    >
+                                      <p className="leading-relaxed text-slate-600">{item.answer}</p>
+                                      <div className="mt-4">
+                                        <button
+                                          type="button"
+                                          onClick={() => copyFAQLink(item.id)}
+                                          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:border-brand-green hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-green"
+                                        >
+                                          <Link2 className="h-4 w-4" aria-hidden="true" />
+                                          Copy answer link
+                                        </button>
+                                        {copyFeedback.itemId === item.id && (
+                                          <p className={`mt-2 text-sm ${copyFeedback.isError ? 'text-red-700' : 'text-emerald-700'}`} role="status" aria-live="polite">
+                                            {copyFeedback.message}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                                        {item.relatedFeatureRef && (
+                                          <button
+                                            type="button"
+                                            onClick={() => applySearchFilter(item.relatedFeatureRef)}
+                                            className="min-h-11 rounded-full bg-brand-softBlue px-3 py-1 text-xs font-semibold text-brand-navy transition hover:bg-brand-navy hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-green sm:min-h-9"
+                                            aria-label={`Search FAQs for ${item.relatedFeatureRef}`}
+                                          >
+                                            {item.relatedFeatureRef}
+                                          </button>
+                                        )}
+                                        {item.tags.map((tag) => (
+                                          <button
+                                            key={tag}
+                                            type="button"
+                                            onClick={() => applySearchFilter(tag)}
+                                            className="min-h-11 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 transition hover:bg-brand-navy hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-green sm:min-h-9"
+                                            aria-label={`Search FAQs tagged ${tag}`}
+                                          >
+                                            {tag}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </div>
                                   )}
-                                  {item.tags.map((tag) => (
-                                    <button
-                                      key={tag}
-                                      type="button"
-                                      onClick={() => applySearchFilter(tag)}
-                                      className="min-h-11 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 transition hover:bg-brand-navy hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-green sm:min-h-9"
-                                      aria-label={`Search FAQs tagged ${tag}`}
-                                    >
-                                      {tag}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </article>
-                        );
-                      })}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-              <CircleHelp className="mx-auto h-10 w-10 text-slate-400" aria-hidden="true" />
-              <h3 className="mt-4 text-lg font-bold text-brand-navy">No matching answers</h3>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-                Try a different search term or clear one of the selected filters to browse more guidance.
-              </p>
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-green px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-green/90 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
-              >
-                <RotateCcw className="h-4 w-4" /> Show all questions
-              </button>
-            </div>
+                                </article>
+                              );
+                            })}
+                          </div>
+                        </section>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+                    <CircleHelp className="mx-auto h-10 w-10 text-slate-400" aria-hidden="true" />
+                    <h3 className="mt-4 text-lg font-bold text-brand-navy">No matching answers</h3>
+                    <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+                      Try a different search term or clear one of the selected filters to browse more guidance.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-green px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-green/90 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
+                    >
+                      <RotateCcw className="h-4 w-4" /> Show all questions
+                    </button>
+                  </div>
+                )}
+              </section>
+            </section>
           )}
-        </section>
+        </div>
+
       </main>
     </div>
   );
