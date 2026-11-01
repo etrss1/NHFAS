@@ -1,11 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   ArrowRight,
+  Bot,
   ChevronDown,
   ChevronUp,
   CircleHelp,
   ClipboardList,
   Link2,
+  LoaderCircle,
   RotateCcw,
   Search,
   ShieldCheck,
@@ -17,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { faqCategories } from '../data/faqData';
+import { supabase } from '../lib/supabase';
 
 const categoryIcons = {
   Users,
@@ -56,6 +59,50 @@ const FAQPage = () => {
   const [selectedRole, setSelectedRole] = useState('all');
   const [openItems, setOpenItems] = useState(() => new Set(linkedFAQ ? [linkedFAQ.item.id] : []));
   const [copyFeedback, setCopyFeedback] = useState({ itemId: '', message: '', isError: false });
+
+  // AI Assistant state
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiAnswer, setAiAnswer] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const buildFaqContext = useMemo(() => {
+    return faqCategories.flatMap((category) =>
+      category.items.map((item) => ({
+        category: category.title,
+        question: item.question,
+        answer: item.answer,
+        featureRef: item.relatedFeatureRef,
+      }))
+    );
+  }, []);
+
+  const askAiAssistant = async (e) => {
+    e.preventDefault();
+    const question = aiQuestion.trim();
+    if (!question || aiLoading) return;
+
+    setAiLoading(true);
+    setAiError('');
+    setAiAnswer('');
+
+    try {
+      const { data, error } = await supabase.functions.invoke('faq-assistant', {
+        body: { question, context: buildFaqContext },
+      });
+
+      if (error) {
+        setAiError(error.message || 'AI assistant could not answer right now.');
+        return;
+      }
+
+      setAiAnswer((data && typeof data === 'object' && 'answer' in data) ? data.answer : '');
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : 'AI assistant could not process your request.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!linkedFAQ) return;
@@ -260,6 +307,65 @@ const FAQPage = () => {
             </Link>
           </section>
         </aside>
+
+        {/* AI Assistant Section */}
+        <section aria-labelledby="ai-assistant-heading" className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-7">
+          <div className="flex items-start gap-3 mb-5">
+            <Bot className="h-5 w-5 text-brand-green shrink-0" aria-hidden="true" />
+            <div>
+              <h2 id="ai-assistant-heading" className="text-lg font-bold text-brand-navy">
+                AI FAQ Assistant
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Ask a question about NHFAS services and get an AI-generated answer based on our knowledge base.
+              </p>
+            </div>
+          </div>
+
+          {aiError && (
+            <p role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+              {aiError}
+            </p>
+          )}
+
+          <form onSubmit={askAiAssistant} className="space-y-3">
+            <div className="relative">
+              <label htmlFor="ai-question" className="sr-only">
+                Ask a question
+              </label>
+              <input
+                id="ai-question"
+                type="text"
+                value={aiQuestion}
+                onChange={(event) => setAiQuestion(event.target.value)}
+                placeholder="e.g. How do I post a job? What is escrow?"
+                className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-green focus:ring-4 focus:ring-brand-green/10"
+                disabled={aiLoading}
+              />
+              {aiLoading && (
+                <LoaderCircle className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-brand-green" aria-label="Loading" />
+              )}
+            </div>
+            <Button
+              type="submit"
+              disabled={aiLoading || !aiQuestion.trim()}
+              className="w-full sm:w-auto gap-2"
+            >
+              {aiLoading ? <LoaderCircle size={14} className="animate-spin" /> : <Bot size={14} />}
+              {aiLoading ? 'Thinking…' : 'Ask AI'}
+            </Button>
+          </form>
+
+          {aiAnswer && (
+            <section className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+              <div className="flex items-start gap-2 mb-2">
+                <Bot className="h-4 w-4 text-brand-green shrink-0" aria-hidden="true" />
+                <h3 className="text-sm font-bold text-brand-green">AI Answer</h3>
+              </div>
+              <p className="text-sm text-slate-800 leading-relaxed">{aiAnswer}</p>
+            </section>
+          )}
+        </section>
 
         <section aria-labelledby="faq-results-heading" className="min-w-0">
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
