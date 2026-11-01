@@ -21,6 +21,7 @@ import SettingsPage from './pages/Settings';
 import SearchResults from './pages/SearchResults';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
+import ResetPassword from './pages/ResetPassword';
 import FindMe from './pages/FindMe';
 import Verification from './pages/Verification';
 import VerificationQueue from './pages/VerificationQueue';
@@ -134,6 +135,7 @@ function App() {
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Dashboard Routes with Sidebar and Topbar */}
         <Route path="/dashboard" element={<DashboardLayout />}>

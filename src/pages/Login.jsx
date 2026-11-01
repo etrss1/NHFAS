@@ -20,7 +20,12 @@ const Login = () => {
       setError('Enter your email above, then tap "Forgot password" again.');
       return;
     }
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(formData.email.trim());
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      formData.email.trim(),
+      {
+        redirectTo: 'https://nhfaas.netlify.app/reset-password',
+      }
+    );
     if (resetError) setError(resetError.message);
     else {
       setError('');

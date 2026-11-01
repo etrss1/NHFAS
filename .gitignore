@@ -56,3 +56,7 @@ srs/
 # Schema scratch/fix scripts
 src/schema/fix-rls-policy-recursion.sql
 src/schema/seed-service-categories.sql
+
+# Project documentation (generated)
+NHFAS_Project_Documentation.md
+NHFAS_Project_Documentation.pdf
